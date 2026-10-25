@@ -386,3 +386,23 @@ def test_accept_best_match(accept_value: str, provided_types: list[str], best_ma
 def test_accept_accepts() -> None:
     accept = Accept("text/plain;q=0.8,text/html")
     assert accept.accepts(MediaType.TEXT)
+
+
+def test_mutable_scope_headers_setitem_replaces_multiple_duplicates() -> None:
+    raw: RawHeadersList = [
+        (b"cache-control", b"private"),
+        (b"cache-control", b"max-age=0"),
+        (b"cache-control", b"must-revalidate"),
+        (b"content-type", b"text/plain"),
+        (b"x-marker", b"tail"),
+    ]
+    headers = MutableScopeHeaders({"headers": raw})
+    headers["Cache-Control"] = "no-store"
+    assert raw == [(b"cache-control", b"no-store"), (b"content-type", b"text/plain"), (b"x-marker", b"tail")]
+
+
+def test_mutable_scope_headers_setitem_replaces_only_duplicates() -> None:
+    raw: RawHeadersList = [(b"a", b"1"), (b"a", b"2"), (b"a", b"3")]
+    headers = MutableScopeHeaders({"headers": raw})
+    headers["a"] = "x"
+    assert raw == [(b"a", b"x")]

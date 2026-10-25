@@ -210,7 +210,7 @@ class MutableScopeHeaders(MutableMapping):
         name_encoded = key.lower().encode("latin-1")
         value_encoded = value.encode("latin-1")
         if indices := self._find_indices(key):
-            for i in indices[1:]:
+            for i in reversed(indices[1:]):
                 del self.headers[i]
             self.headers[indices[0]] = (name_encoded, value_encoded)
         else:
